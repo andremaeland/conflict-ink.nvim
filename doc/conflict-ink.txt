@@ -1,0 +1,195 @@
+*conflict-ink.txt*  Visual styling for git conflict markers
+
+==============================================================================
+CONTENTS                                              *conflict-ink-contents*
+
+  1. Introduction .......................... |conflict-ink-introduction|
+  2. Setup ................................ |conflict-ink-setup|
+  3. Configuration ........................ |conflict-ink-configuration|
+  4. Mappings ............................. |conflict-ink-mappings|
+  5. Commands ............................. |conflict-ink-commands|
+  6. Highlights ........................... |conflict-ink-highlights|
+  7. Statusline ........................... |conflict-ink-statusline|
+  8. LSP diagnostics ...................... |conflict-ink-lsp|
+  9. Diff3 support ........................ |conflict-ink-diff3|
+
+==============================================================================
+1. INTRODUCTION                                   *conflict-ink-introduction*
+
+conflict-ink.nvim highlights git conflict markers with distinct background
+colors for "ours" and "theirs" sections, and shows a right-aligned keybinding
+hint with a conflict counter when the cursor is inside a conflict block.
+Provides mappings and commands to quickly resolve conflicts.
+
+Features:
+- Overlay labels replace raw `<<<<<<<`/`>>>>>>>` markers
+- Theme-aware colors (dark and light backgrounds)
+- Right-aligned hint with keybindings and conflict counter `(1/3)`
+- Diff3 support (`||||||| base` section)
+
+==============================================================================
+2. SETUP                                                 *conflict-ink-setup*
+
+Add the plugin with your package manager, then call setup:
+>lua
+  require("conflict-ink").setup()
+<
+
+With lazy.nvim:
+>lua
+  {
+    "your-user/conflict-ink.nvim",
+    event = "BufReadPost",
+    opts = {},
+  }
+<
+
+==============================================================================
+3. CONFIGURATION                                 *conflict-ink-configuration*
+
+Highlight colors are automatically chosen based on 'background' (dark or
+light) and re-applied on |ColorScheme| changes. You can override any of them:
+>lua
+  require("conflict-ink").setup({
+    enabled = true,
+
+    -- All highlight keys are optional; omitted keys use theme-aware defaults.
+    highlights = {
+      current        = { bg = "#2D4A2D", bold = true },  -- dark default
+      current_label  = { bg = "#385C38", bold = true },
+      incoming       = { bg = "#3D2D5C", bold = true },
+      incoming_label = { bg = "#4A3870", bold = true },
+      base           = { bg = "#3B3926", bold = true },
+      base_label     = { bg = "#4A4830", bold = true },
+      hint           = { link = "Comment" },
+      hint_key       = { link = "Keyword" },
+    },
+
+    mappings = {
+      ours          = "co",
+      theirs        = "ct",
+      both          = "cb",
+      none          = "c0",
+      next_conflict = "]x",
+      prev_conflict = "[x",
+    },
+
+    default_mappings          = true,
+    hint_enabled              = true,
+    suppress_lsp_diagnostics  = false,
+  })
+<
+
+==============================================================================
+4. MAPPINGS                                       *conflict-ink-mappings*
+
+Buffer-local mappings are set automatically when a file contains conflicts.
+All mappings operate on the conflict block under the cursor.
+
+  `co`    Accept ours (current) side
+  `ct`    Accept theirs (incoming) side
+  `cb`    Keep both sides
+  `c0`    Remove both sides (choose none)
+  `]x`    Jump to next conflict
+  `[x`    Jump to previous conflict
+
+Set `default_mappings = false` to disable and define your own.
+
+==============================================================================
+5. COMMANDS                                       *conflict-ink-commands*
+
+                                                     *:ConflictInkRefresh*
+:ConflictInkRefresh     Re-scan the current buffer for conflict markers.
+
+                                                     *:ConflictInkOurs*
+:ConflictInkOurs        Accept the current (ours) side.
+
+                                                     *:ConflictInkTheirs*
+:ConflictInkTheirs      Accept the incoming (theirs) side.
+
+                                                     *:ConflictInkBoth*
+:ConflictInkBoth        Keep both sides.
+
+                                                     *:ConflictInkNone*
+:ConflictInkNone        Remove both sides.
+
+                                                     *:ConflictInkNext*
+:ConflictInkNext        Jump to the next conflict.
+
+                                                     *:ConflictInkPrev*
+:ConflictInkPrev        Jump to the previous conflict.
+
+                                                     *:ConflictInkAllOurs*
+:ConflictInkAllOurs     Accept ours for all conflicts in the buffer.
+
+                                                     *:ConflictInkAllTheirs*
+:ConflictInkAllTheirs   Accept theirs for all conflicts in the buffer.
+
+==============================================================================
+6. HIGHLIGHTS                                     *conflict-ink-highlights*
+
+The following highlight groups are defined. All adapt automatically to
+light/dark colorschemes.
+
+  *ConflictInkCurrent*        Background for "ours" content lines.
+  *ConflictInkCurrentLabel*   Overlay label on the `<<<<<<<` marker line.
+                            Displays as: `<<<<<<< HEAD · Your changes`
+  *ConflictInkIncoming*       Background for "theirs" content lines.
+  *ConflictInkIncomingLabel*  Overlay label on the `>>>>>>>` marker line.
+                            Displays as: `>>>>>>> branch · Incoming changes`
+  *ConflictInkBase*           Background for diff3 base content lines.
+  *ConflictInkBaseLabel*      Overlay label on the `|||||||` marker line.
+                            Displays as: `||||||| ancestor · Common ancestor`
+  *ConflictInkHint*           Hint label text (right-aligned virtual text).
+  *ConflictInkHintKey*        Keybinding keys in the hint (e.g. `co`, `ct`).
+                            Also used for the conflict counter `(1/3)`.
+
+==============================================================================
+7. STATUSLINE                                     *conflict-ink-statusline*
+
+A statusline component is provided for lualine, heirline, or any custom
+statusline. Returns a string like "3 conflicts" or "" if none.
+>lua
+  -- lualine example
+  require("lualine").setup({
+    sections = {
+      lualine_x = { require("conflict-ink").status },
+    },
+  })
+<
+
+==============================================================================
+8. LSP DIAGNOSTICS                               *conflict-ink-lsp*
+
+When `suppress_lsp_diagnostics = true`, LSP diagnostic display (virtual
+text, signs, underlines) is suppressed in buffers with active conflicts.
+LSP itself stays running — hover, completion, and go-to-definition still
+work. Diagnostics are automatically restored when all conflicts are
+resolved.
+
+>lua
+  require("conflict-ink").setup({
+    suppress_lsp_diagnostics = true,
+  })
+<
+
+==============================================================================
+9. DIFF3 SUPPORT                                       *conflict-ink-diff3*
+
+When using `git config merge.conflictstyle diff3`, conflicts include a
+base section showing the common ancestor:
+>
+  <<<<<<< HEAD
+  our changes
+  ||||||| merged common ancestor
+  original code
+  =======
+  their changes
+  >>>>>>> feature
+<
+
+conflict-ink.nvim detects and highlights the base section with its own
+color (yellowish tint). When resolving with `co`, `ct`, `cb`, or `c0`,
+the base section is removed along with the markers.
+
+vim:tw=78:ts=8:ft=help:norl:

@@ -1,0 +1,40 @@
+Some code above the conflict.
+
+<<<<<<< HEAD
+function hello()
+  print("hello from main")
+end
+=======
+function hello()
+  print("hello from feature-branch")
+  print("with extra logging")
+end
+>>>>>>> feature-branch
+
+Some code between conflicts.
+
+<<<<<<< HEAD
+local config = {
+  debug = false,
+  port = 3000,
+}
+=======
+local config = {
+  debug = true,
+  port = 8080,
+  host = "localhost",
+}
+>>>>>>> feature-branch
+
+Some code between conflicts.
+
+-- diff3 style conflict (merge.conflictstyle = diff3)
+<<<<<<< HEAD
+local timeout = 5000
+||||||| merged common ancestor
+local timeout = 3000
+=======
+local timeout = 10000
+>>>>>>> feature-branch
+
+Some code after the conflicts.
