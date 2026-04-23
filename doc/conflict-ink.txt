@@ -25,7 +25,10 @@ Features:
 - Overlay labels replace raw `<<<<<<<`/`>>>>>>>` markers
 - Theme-aware colors (dark and light backgrounds)
 - Right-aligned hint with keybindings and conflict counter `(1/3)`
+- Smart auto-resolve for non-overlapping conflicts
 - Diff3 support (`||||||| base` section)
+- LSP diagnostic suppression during conflicts
+- Statusline component
 
 ==============================================================================
 2. SETUP                                                 *conflict-ink-setup*
@@ -124,6 +127,13 @@ Set `default_mappings = false` to disable and define your own.
 
                                                      *:ConflictInkAllTheirs*
 :ConflictInkAllTheirs   Accept theirs for all conflicts in the buffer.
+
+                                                     *:ConflictInkResolve*
+:ConflictInkResolve     Smart auto-resolve non-overlapping conflicts.
+                        Fetches the base version from the git index, diffs
+                        each side against it, and merges changes that don't
+                        overlap. Truly conflicting changes are left as-is.
+                        Does not require `merge.conflictstyle = diff3`.
 
 ==============================================================================
 6. HIGHLIGHTS                                     *conflict-ink-highlights*
