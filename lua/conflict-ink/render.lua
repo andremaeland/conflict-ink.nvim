@@ -69,8 +69,14 @@ function M.refresh(bufnr, force)
   vim.api.nvim_buf_clear_namespace(bufnr, NS, 0, -1)
   vim.api.nvim_buf_clear_namespace(bufnr, HINT_NS, 0, -1)
 
+  local prev_conflicts = buf_state[bufnr]
   local conflicts = parser.parse(bufnr)
   buf_state[bufnr] = conflicts
+
+  -- Notify when all conflicts have been resolved
+  if prev_conflicts and #prev_conflicts > 0 and #conflicts == 0 then
+    vim.notify("conflict-ink: all conflicts resolved", vim.log.levels.INFO)
+  end
 
   -- Suppress/restore LSP diagnostics based on conflict presence
   local config = require("conflict-ink").config
