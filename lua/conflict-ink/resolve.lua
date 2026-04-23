@@ -240,9 +240,7 @@ function M.resolve(bufnr)
   render.refresh(bufnr, true)
 
   local remaining = total - resolved
-  if remaining == 0 then
-    vim.notify("conflict-ink: all " .. total .. " conflicts resolved", vim.log.levels.INFO)
-  else
+  if remaining > 0 then
     vim.notify(
       string.format("conflict-ink: resolved %d/%d conflicts (%d remaining)", resolved, total, remaining),
       vim.log.levels.INFO
