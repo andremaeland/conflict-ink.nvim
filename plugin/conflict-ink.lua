@@ -56,3 +56,7 @@ end, { desc = "Accept theirs for all conflicts" })
 vim.api.nvim_create_user_command("ConflictInkResolve", function()
   require("conflict-ink.resolve").resolve()
 end, { desc = "Smart auto-resolve non-overlapping conflicts" })
+
+vim.api.nvim_create_user_command("ConflictInkQuickfix", function()
+  require("conflict-ink.quickfix").populate()
+end, { desc = "Populate quickfix list with all project conflicts" })
