@@ -70,6 +70,21 @@ function M.setup(opts)
     end,
   })
 
+  vim.api.nvim_create_autocmd("VimEnter", {
+    group = group,
+    callback = function()
+      require("conflict-ink.highlights").setup(M.config.highlights)
+    end,
+  })
+
+  vim.api.nvim_create_autocmd("OptionSet", {
+    group = group,
+    pattern = "background",
+    callback = function()
+      require("conflict-ink.highlights").setup(M.config.highlights)
+    end,
+  })
+
   -- Attach and refresh current buffer immediately if already loaded
   local bufnr = vim.api.nvim_get_current_buf()
   if vim.bo[bufnr].buftype == "" and vim.api.nvim_buf_is_loaded(bufnr) then

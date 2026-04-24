@@ -9,6 +9,29 @@ M.BASE_LABEL = "ConflictInkBaseLabel"
 M.HINT = "ConflictInkHint"
 M.HINT_KEY = "ConflictInkHintKey"
 
+--- Calculate relative luminance of a hex color (sRGB).
+--- @param hex string e.g. "#1e1e2e"
+--- @return number luminance 0.0 to 1.0
+local function luminance(hex)
+  local r = tonumber(hex:sub(2, 3), 16) / 255
+  local g = tonumber(hex:sub(4, 5), 16) / 255
+  local b = tonumber(hex:sub(6, 7), 16) / 255
+  r = r <= 0.03928 and r / 12.92 or ((r + 0.055) / 1.055) ^ 2.4
+  g = g <= 0.03928 and g / 12.92 or ((g + 0.055) / 1.055) ^ 2.4
+  b = b <= 0.03928 and b / 12.92 or ((b + 0.055) / 1.055) ^ 2.4
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b
+end
+
+--- Get the background color from the Normal highlight group.
+--- @return string|nil hex color
+local function get_bg_color()
+  local ok, hl = pcall(vim.api.nvim_get_hl, 0, { name = "Normal", link = false })
+  if ok and hl and hl.bg then
+    return string.format("#%06x", hl.bg)
+  end
+  return nil
+end
+
 local dark = {
   current = { bg = "#2D4A2D", bold = true },
   current_label = { bg = "#385C38", bold = true },
@@ -16,6 +39,17 @@ local dark = {
   incoming_label = { bg = "#4A3870", bold = true },
   base = { bg = "#3B3926", bold = true },
   base_label = { bg = "#4A4830", bold = true },
+  hint = { link = "Comment" },
+  hint_key = { link = "Keyword" },
+}
+
+local dark_high_contrast = {
+  current = { bg = "#1e6b26", bold = true },
+  current_label = { bg = "#28753b", bold = true },
+  incoming = { bg = "#5e35b1", bold = true },
+  incoming_label = { bg = "#6a3dba", bold = true },
+  base = { bg = "#5e5c20", bold = true },
+  base_label = { bg = "#706e24", bold = true },
   hint = { link = "Comment" },
   hint_key = { link = "Keyword" },
 }
@@ -31,10 +65,14 @@ local light = {
   hint_key = { link = "Keyword" },
 }
 
---- Get theme-aware defaults based on background setting.
+--- Get theme-aware defaults based on background setting and actual background luminance.
 function M.defaults()
   if vim.o.background == "light" then
     return light
+  end
+  local bg = get_bg_color()
+  if bg and luminance(bg) < 0.007 then
+    return dark_high_contrast
   end
   return dark
 end
