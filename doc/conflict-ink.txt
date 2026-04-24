@@ -135,6 +135,11 @@ Set `default_mappings = false` to disable and define your own.
                         overlap. Truly conflicting changes are left as-is.
                         Does not require `merge.conflictstyle = diff3`.
 
+                                                     *:ConflictInkQuickfix*
+:ConflictInkQuickfix    Populate the quickfix list with all conflicts found
+                        across the project. Each entry shows the file, line,
+                        and branch label. Requires ripgrep (`rg`).
+
 ==============================================================================
 6. HIGHLIGHTS                                     *conflict-ink-highlights*
 

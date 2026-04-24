@@ -18,6 +18,7 @@ Enhanced visual styling and smart resolution for git merge conflicts in Neovim.
 ## Requirements
 
 - Neovim >= 0.10
+- [ripgrep](https://github.com/BurntSushi/ripgrep) (optional, for `:ConflictInkQuickfix`)
 
 ## Installation
 
@@ -95,6 +96,7 @@ Set `default_mappings = false` to disable and define your own.
 | `:ConflictInkAllOurs` | Accept ours for all conflicts |
 | `:ConflictInkAllTheirs` | Accept theirs for all conflicts |
 | `:ConflictInkRefresh` | Re-scan buffer for conflicts |
+| `:ConflictInkQuickfix` | Populate quickfix list with all project conflicts (requires `rg`) |
 
 ## Smart Resolve
 
