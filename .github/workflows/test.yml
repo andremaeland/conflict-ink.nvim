@@ -28,6 +28,6 @@ jobs:
         run: |
           nvim --headless -u tests/minimal_init.vim \
             -c "PlenaryBustedDirectory tests/ {minimal_init = 'tests/minimal_init.vim'}" 2>&1 \
-            | tee test_output.txt
-          # Fail if any test failed
-          grep -q "Failed : 0" test_output.txt
+            | sed 's/\x1b\[[0-9;]*m//g' | tee test_output.txt
+          # Fail if any test failed (output is tab-separated)
+          grep -qE "Failed :[[:space:]]+0" test_output.txt
