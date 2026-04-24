@@ -60,3 +60,7 @@ end, { desc = "Smart auto-resolve non-overlapping conflicts" })
 vim.api.nvim_create_user_command("ConflictInkQuickfix", function()
   require("conflict-ink.quickfix").populate()
 end, { desc = "Populate quickfix list with all project conflicts" })
+
+vim.api.nvim_create_user_command("ConflictInkMerge", function()
+  require("conflict-ink.three_way").open()
+end, { desc = "Open three-way merge view (Ours | Result | Theirs)" })

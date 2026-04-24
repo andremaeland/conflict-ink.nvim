@@ -8,10 +8,11 @@ CONTENTS                                              *conflict-ink-contents*
   3. Configuration ........................ |conflict-ink-configuration|
   4. Mappings ............................. |conflict-ink-mappings|
   5. Commands ............................. |conflict-ink-commands|
-  6. Highlights ........................... |conflict-ink-highlights|
-  7. Statusline ........................... |conflict-ink-statusline|
-  8. LSP diagnostics ...................... |conflict-ink-lsp|
-  9. Diff3 support ........................ |conflict-ink-diff3|
+  6. Three-way merge view ................. |conflict-ink-three-way|
+  7. Highlights ........................... |conflict-ink-highlights|
+  8. Statusline ........................... |conflict-ink-statusline|
+  9. LSP diagnostics ...................... |conflict-ink-lsp|
+ 10. Diff3 support ........................ |conflict-ink-diff3|
 
 ==============================================================================
 1. INTRODUCTION                                   *conflict-ink-introduction*
@@ -26,6 +27,7 @@ Features:
 - Theme-aware colors (dark and light backgrounds)
 - Right-aligned hint with keybindings and conflict counter `(1/3)`
 - Smart auto-resolve for non-overlapping conflicts
+- Three-way merge view (Ours | Result | Theirs) in a new tab
 - Diff3 support (`||||||| base` section)
 - LSP diagnostic suppression during conflicts
 - Statusline component
@@ -140,8 +142,40 @@ Set `default_mappings = false` to disable and define your own.
                         across the project. Each entry shows the file, line,
                         and branch label. Requires ripgrep (`rg`).
 
+                                                     *:ConflictInkMerge*
+:ConflictInkMerge       Open the three-way merge view in a new tab.
+                        See |conflict-ink-three-way|.
+
 ==============================================================================
-6. HIGHLIGHTS                                     *conflict-ink-highlights*
+6. THREE-WAY MERGE VIEW                           *conflict-ink-three-way*
+
+`:ConflictInkMerge` opens a dedicated tab with three synchronized panes:
+
+  Ours (read-only) | Result (editable) | Theirs (read-only)
+
+All panes share the same line count and are scrollbound, so every line in
+each pane corresponds to the same logical line — no filler-line artifacts.
+
+The outer panes show each branch's content at its original positions; lines
+belonging to the opposite side are blanked out. Conflict regions are
+highlighted with the standard ConflictInk highlight groups, and sign-column
+arrows (▶▶ / ◀◀) mark the conflict blocks.
+
+Winbar labels show the branch names extracted from the conflict markers.
+
+Keybindings active in the Result pane:
+
+  `co`    Accept ours for conflict under cursor
+  `ct`    Accept theirs for conflict under cursor
+  `]x`    Jump to next conflict
+  `[x`    Jump to previous conflict
+  `q`     Close the tab and write the result back to the original buffer
+
+When `q` is pressed, the resolved content is written back to the original
+buffer and the merge tab is closed.
+
+==============================================================================
+7. HIGHLIGHTS                                     *conflict-ink-highlights*
 
 The following highlight groups are defined. All adapt automatically to
 light/dark colorschemes.
@@ -160,7 +194,7 @@ light/dark colorschemes.
                             Also used for the conflict counter `(1/3)`.
 
 ==============================================================================
-7. STATUSLINE                                     *conflict-ink-statusline*
+8. STATUSLINE                                     *conflict-ink-statusline*
 
 A statusline component is provided for lualine, heirline, or any custom
 statusline. Returns a string like "3 conflicts" or "" if none.
@@ -174,7 +208,7 @@ statusline. Returns a string like "3 conflicts" or "" if none.
 <
 
 ==============================================================================
-8. LSP DIAGNOSTICS                               *conflict-ink-lsp*
+9. LSP DIAGNOSTICS                                    *conflict-ink-lsp*
 
 When `suppress_lsp_diagnostics = true`, LSP diagnostic display (virtual
 text, signs, underlines) is suppressed in buffers with active conflicts.
@@ -189,7 +223,7 @@ resolved.
 <
 
 ==============================================================================
-9. DIFF3 SUPPORT                                       *conflict-ink-diff3*
+10. DIFF3 SUPPORT                                      *conflict-ink-diff3*
 
 When using `git config merge.conflictstyle diff3`, conflicts include a
 base section showing the common ancestor:
