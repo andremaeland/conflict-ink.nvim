@@ -7,20 +7,10 @@ local MARKERS = {
   theirs = "^>>>>>>>",
 }
 
---- Parse a buffer for git conflict markers.
---- Supports both standard and diff3 (||||||| base) conflict styles.
---- @param bufnr number|nil Buffer number (default: current)
---- @return table[] List of conflict blocks (0-indexed line numbers):
----   - start: <<<<<<< line
----   - base: ||||||| line (nil if not diff3)
----   - separator: ======= line
----   - finish: >>>>>>> line
----   - ours_label: text of the <<<<<<< line
----   - theirs_label: text of the >>>>>>> line
----   - base_label: text of the ||||||| line (nil if not diff3)
-function M.parse(bufnr)
-  bufnr = bufnr or 0
-  local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
+--- Parse a list of lines for git conflict markers.
+--- @param lines string[] Lines to parse
+--- @return table[] List of conflict blocks (0-indexed line numbers)
+function M.parse_lines(lines)
   local conflicts = {}
   local current = nil
 
@@ -42,6 +32,23 @@ function M.parse(bufnr)
   end
 
   return conflicts
+end
+
+--- Parse a buffer for git conflict markers.
+--- Supports both standard and diff3 (||||||| base) conflict styles.
+--- @param bufnr number|nil Buffer number (default: current)
+--- @return table[] List of conflict blocks (0-indexed line numbers):
+---   - start: <<<<<<< line
+---   - base: ||||||| line (nil if not diff3)
+---   - separator: ======= line
+---   - finish: >>>>>>> line
+---   - ours_label: text of the <<<<<<< line
+---   - theirs_label: text of the >>>>>>> line
+---   - base_label: text of the ||||||| line (nil if not diff3)
+function M.parse(bufnr)
+  bufnr = bufnr or 0
+  local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
+  return M.parse_lines(lines)
 end
 
 return M
