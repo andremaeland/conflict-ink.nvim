@@ -1,0 +1,33 @@
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        neovim: [stable, nightly]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: rhysd/action-setup-vim@v1
+        with:
+          neovim: true
+          version: ${{ matrix.neovim }}
+
+      - name: Install plenary.nvim
+        run: |
+          git clone --depth 1 https://github.com/nvim-lua/plenary.nvim ~/.local/share/nvim/lazy/plenary.nvim
+
+      - name: Run tests
+        run: |
+          nvim --headless -u tests/minimal_init.vim \
+            -c "PlenaryBustedDirectory tests/ {minimal_init = 'tests/minimal_init.vim'}" 2>&1 \
+            | tee test_output.txt
+          # Fail if any test failed
+          grep -q "Failed : 0" test_output.txt
