@@ -10,6 +10,7 @@ Enhanced visual styling and smart resolution for git merge conflicts in Neovim.
 - **Theme-aware highlights** — distinct colors for ours/theirs/base sections, adapts to dark and light colorschemes
 - **Keybinding hints** — right-aligned virtual text with conflict counter `(1/3)` shown when cursor enters a conflict
 - **Smart auto-resolve** — merges non-overlapping changes automatically using the git index (no `diff3` config needed)
+- **Three-way merge view** — side-by-side Ours | Result | Theirs layout in a new tab with scrollbind alignment
 - **Diff3 support** — detects and highlights `|||||||` base sections
 - **LSP diagnostic suppression** — optionally hides noisy LSP errors while conflicts exist, restores when resolved
 - **Statusline component** — conflict count for lualine/heirline integration
@@ -87,6 +88,7 @@ Set `default_mappings = false` to disable and define your own.
 | Command | Description |
 |---------|-------------|
 | `:ConflictInkResolve` | Smart auto-resolve non-overlapping conflicts |
+| `:ConflictInkMerge` | Open three-way merge view (Ours \| Result \| Theirs) |
 | `:ConflictInkOurs` | Accept ours for conflict under cursor |
 | `:ConflictInkTheirs` | Accept theirs for conflict under cursor |
 | `:ConflictInkBoth` | Keep both sides |
@@ -108,6 +110,32 @@ Set `default_mappings = false` to disable and define your own.
 4. Leaving truly conflicting changes as-is
 
 This does **not** require `git config merge.conflictstyle diff3` — the base is fetched directly from the git index.
+
+## Three-Way Merge View
+
+`:ConflictInkMerge` opens a dedicated merge tab with three synchronized panes:
+
+```
+┌──────────────┬──────────────┬──────────────┐
+│  ▶▶  Ours   │   Result     │ ◀◀  Theirs  │
+│  (read-only) │  (editable)  │ (read-only)  │
+└──────────────┴──────────────┴──────────────┘
+```
+
+- All three panes share the same line count and are scrollbound — no filler-line artifacts
+- Edit conflicts directly in the **Result** pane; the outer panes update automatically
+- Winbar labels show the branch names from the conflict markers
+- Press `q` in the Result pane to close the tab and write changes back to the original buffer
+
+Keybindings active in the Result pane:
+
+| Key | Action |
+|-----|--------|
+| `co` | Accept ours |
+| `ct` | Accept theirs |
+| `]x` | Next conflict |
+| `[x` | Previous conflict |
+| `q` | Close and apply result |
 
 ## Statusline
 
