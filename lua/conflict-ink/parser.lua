@@ -8,6 +8,8 @@ local MARKERS = {
 }
 
 --- Parse a list of lines for git conflict markers.
+--- Line numbers in the returned table are 0-indexed to match the nvim_buf_* API convention
+--- used by render.lua and actions.lua. When building quickfix entries, add 1 to convert.
 --- @param lines string[] Lines to parse
 --- @return table[] List of conflict blocks (0-indexed line numbers)
 function M.parse_lines(lines)

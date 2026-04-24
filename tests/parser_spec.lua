@@ -120,3 +120,51 @@ describe("parser", function()
     assert.equals(0, #conflicts)
   end)
 end)
+
+describe("parse_lines", function()
+  it("returns the same result as parse for equivalent content", function()
+    local lines = {
+      "<<<<<<< HEAD",
+      "ours line",
+      "=======",
+      "theirs line",
+      ">>>>>>> feature",
+    }
+    local bufnr = create_buf(lines)
+    assert.same(parser.parse(bufnr), parser.parse_lines(lines))
+  end)
+
+  it("returns 0-indexed line numbers", function()
+    local lines = {
+      "<<<<<<< HEAD",
+      "ours line",
+      "=======",
+      "theirs line",
+      ">>>>>>> feature",
+    }
+    local conflicts = parser.parse_lines(lines)
+    assert.equals(1, #conflicts)
+    assert.equals(0, conflicts[1].start)
+    assert.equals(2, conflicts[1].separator)
+    assert.equals(4, conflicts[1].finish)
+  end)
+
+  it("handles multiple conflicts", function()
+    local lines = {
+      "<<<<<<< HEAD",
+      "ours 1",
+      "=======",
+      "theirs 1",
+      ">>>>>>> feature",
+      "<<<<<<< HEAD",
+      "ours 2",
+      "=======",
+      "theirs 2",
+      ">>>>>>> feature",
+    }
+    local conflicts = parser.parse_lines(lines)
+    assert.equals(2, #conflicts)
+    assert.equals(0, conflicts[1].start)
+    assert.equals(5, conflicts[2].start)
+  end)
+end)
